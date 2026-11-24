@@ -19,6 +19,8 @@ jobs:
       matrix:
         dir:
           - "tests/minimal"
+          - "tests/addon"
+          - "tests/warp-drive"
 
     steps:
       - uses: wyvox/action@v2

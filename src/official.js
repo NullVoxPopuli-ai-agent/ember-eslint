@@ -8,7 +8,13 @@ import ember from 'eslint-plugin-ember/recommended';
 import prettier from 'eslint-config-prettier';
 import qunit from 'eslint-plugin-qunit';
 import n from 'eslint-plugin-n';
-import { hasTypescript, hasTypeModule } from './utils.js';
+import { importX } from 'eslint-plugin-import-x';
+import {
+  hasTypescript,
+  hasTypeModule,
+  isV2Addon,
+  optionalRequire,
+} from './utils.js';
 
 import babelParser from '@babel/eslint-parser';
 
@@ -19,6 +25,8 @@ export function official(root) {
   let hasTS = hasTypescript(root);
   let esm = parserOptions.esm(root);
   let isTypeModule = hasTypeModule(root);
+  let warpDrive = optionalRequire(root, 'eslint-plugin-warp-drive/recommended');
+  let isAddon = isV2Addon(root);
 
   return ts.config(
     [
@@ -29,6 +37,11 @@ export function official(root) {
       ember.configs.base,
       ember.configs.gjs,
       ember.configs.gts,
+      ...(warpDrive
+        ? warpDrive.map((config, index) => {
+            return { ...config, name: `warp-drive:recommended:${index}` };
+          })
+        : []),
       {
         name: 'prettier:disable-conflicting',
         ...prettier,
@@ -159,6 +172,27 @@ export function official(root) {
               qunit,
             },
           },
+
+      isAddon
+        ? {
+            name: 'ember-eslint:addon/import-extensions',
+            files: ['src/**/*'],
+            plugins: {
+              'import-x': importX,
+            },
+            rules: {
+              /**
+               * Published v2 addons are consumed as plain ESM,
+               * which requires full extensions on relative imports.
+               */
+              'import-x/extensions': [
+                'error',
+                'always',
+                { ignorePackages: true },
+              ],
+            },
+          }
+        : null,
 
       /**
        * CJS node files
