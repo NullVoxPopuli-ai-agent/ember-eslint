@@ -59,11 +59,17 @@ This config supports a 2x2x2 matrix of features:
 - App vs Addon
 - `type=module` packages and classic packages 
 
+#### Detected features
+
+- v2 addons (`ember-addon.version` is `2`): relative imports in `src/` must use full file extensions, via `import-x/extensions`.
+- [WarpDrive](https://warp-drive.io/): if your project installs `eslint-plugin-warp-drive`, its recommended rules are on.
+
 ## Exported utilities
 
 - `utils.hasBabelConfig` - returns true when the host environment has a babel config 
 - `utils.hasTypescript` - returns true when the host environment has typescript
 - `utils.hasTypeModule` - returns true when the host environment has `type=module` in the package.json
+- `utils.isV2Addon` - returns true when the host package is a v2 addon
 - `parsers.esm` - the parser options for JS (babel) and TS ESM files
 
 ## Debugging ESLint

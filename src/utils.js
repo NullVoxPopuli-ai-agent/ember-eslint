@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 
 const babelConfigCandidates = [
@@ -17,10 +18,39 @@ export function hasTypescript(root) {
   return existsSync(join(root, 'tsconfig.json'));
 }
 
-export function hasTypeModule(root) {
+function readManifest(root) {
   let manifestPath = join(root, 'package.json');
   let buffer = readFileSync(manifestPath);
-  let manifest = JSON.parse(buffer.toString());
 
-  return manifest.type === 'module';
+  return JSON.parse(buffer.toString());
+}
+
+export function hasTypeModule(root) {
+  return readManifest(root).type === 'module';
+}
+
+export function isV2Addon(root) {
+  let manifest = readManifest(root);
+
+  return (
+    Boolean(manifest.keywords?.includes('ember-addon')) &&
+    manifest['ember-addon']?.version === 2
+  );
+}
+
+/**
+ * Resolves from the project, not from ember-eslint,
+ * so that only projects that install the package pay for it.
+ */
+export function optionalRequire(root, specifier) {
+  let require = createRequire(join(root, 'package.json'));
+  let resolved;
+
+  try {
+    resolved = require.resolve(specifier);
+  } catch {
+    return undefined;
+  }
+
+  return require(resolved);
 }

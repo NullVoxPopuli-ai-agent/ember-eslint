@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "name": "tests-warp-drive",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "decorator-transforms": "^2.3.2",
+    "ember-eslint": "workspace:*",
+    "eslint": "^10.9.1",
+    "eslint-plugin-warp-drive": "^5.9.1"
+  }
+}
